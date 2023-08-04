@@ -1,0 +1,154 @@
+//@import 'bootstrap/dist/css/bootstrap.css';
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-family: $font__app-body;
+    background: $background__main;
+}
+
+html {
+    font-size: 14px;
+}
+
+button {
+    font-size: 100%;
+}
+
+.container {
+    background: $background__container;
+}
+
+.title {
+    font-size: 1.777rem;
+    color: $color__titles;
+    margin: 1rem 0;
+    text-decoration: $decoration__titles;
+    text-align: center;
+    font-family: $font__app-header;
+}
+
+.subtitle {
+    font-size: 1.333rem;
+    color: $color__subtitles;
+    margin: 1rem 0;
+    text-decoration: $decoration__subtitles;
+}
+
+.content {
+    font-size: 1rem;
+    color: $color__content;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.button {
+    padding: 0.75rem 3rem;
+    border: 0.05rem solid $border__button;
+    background-color: $background__button;
+    color: $color__button;
+    cursor: pointer;
+    &:active {
+        border: 0.05rem solid $border__button;
+        background-color: $background__button;
+        color: $color__button;
+    }
+}
+
+.modal {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.75);
+    display: flex;
+    align-items: flex-start;
+    z-index: 5;
+    .container {
+        background-color: transparent;
+        height: 100%;
+    }
+    .row {
+        padding: 0;
+        height: 100%;
+    }
+    .modal-content {
+        height: calc(100% - 8rem);
+        padding-bottom: 2rem;
+        margin-top: 4rem;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    .close {
+        width: 2rem;
+        height: 2rem;
+        margin-top: 1rem;
+        margin-right: 1rem;
+        margin-left: auto;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-color: transparent;
+        border: none;
+    }
+}
+
+a {
+    color: $color__link;
+    cursor: pointer;
+    text-decoration: $decoration__link;
+    &:active {
+        color: $color__link-active;
+    }
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: $color__titles;
+    font-weight: $weight__headers;
+    font-family: $font__app-header;
+}
+
+body, p, li, button, span, div, input {
+    color: $color__content;
+    font-weight: $weight__body;
+    font-family: $font__app-body;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 14px;
+    }
+}
+
+@media (min-width: 992px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+@media (min-width: 1200px) {
+    html {
+        font-size: 18px;
+    }
+}

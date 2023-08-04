@@ -1,0 +1,16 @@
+{
+    "domain": "http://localhost:5173",
+    "xpkit": {
+        "account_id": "",
+        "region": "emea.xpkit.net",
+        "auth_client_id": "",
+        "auth_callback": "/auth-callback/",
+        "auth_providers": ["apple", "facebook", "google", "linkedin", "microsoft", "xpkit"],
+        "enable_xpkit_register": true,
+        "registration_activity": {
+            "activity_type": "registration",
+            "experience_id": "example-experience",
+            "object_id": "registration-site"
+        }
+    }
+}
