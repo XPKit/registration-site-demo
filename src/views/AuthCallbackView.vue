@@ -1,4 +1,5 @@
 <script>
+import { exchangeCodeForToken } from 'xpkit-sdk';
 
 export default {
     name: 'AuthCallbackView',
@@ -23,46 +24,32 @@ export default {
     },
     methods: {
         async exchangeCode() {
-            const tokenExchangeEndpoint = `https://auth.${this.appSettings.xpkit.region}/api/token/`;
+            const options = {
+                base_url: this.appSettings.xpkit.region,
+                auth: {
+                    client_id: this.appSettings.xpkit.auth_client_id,
+                    client_secret: ''
+                },
+                logging: false
+            };
             const redirectUrl = `${this.appSettings.domain}${this.appSettings.xpkit.auth_callback}`;
-            const formData = new FormData();
-            formData.append('grant_type', 'authorization_code');
-            formData.append('code', this.code);
-            formData.append('client_id', this.appSettings.xpkit.auth_client_id);
-            formData.append('redirect_uri', redirectUrl);
-            formData.append('code_verifier', this.codeVerifier);
-
-            const response = await fetch(tokenExchangeEndpoint, {
-                method: 'POST',
-                body: formData
-            });
-            return response.json();
+            return await exchangeCodeForToken(options, this.$route.query.code, this.$route.query.state, redirectUrl);
         }
     },
-    mounted() {
-        const sessionStorage = window.sessionStorage;
-        this.state = sessionStorage.getItem('state');
-        this.codeVerifier = sessionStorage.getItem('codeVerifier');
-        this.code = this.$route.query.code;
-
-        if (this.state !== this.$route.query.state || ! this.code) {
-            this.error = this.errors['state'];
-        }
+    async mounted() {
         if (this.$route.query.error) {
             this.error = this.errors[this.$route.query.error];
+            return;
         }
 
-        if (! this.error) {
-            this.exchangeCode().then((data) => {
-                if (data['access_token']) {
-                    sessionStorage.setItem('xpkitAccessToken', data['access_token']);
-                    return this.$router.push({ name: 'visitor-details' });
-                };
+        const authResponse = await this.exchangeCode();
+        if (authResponse['access_token']) {
+            sessionStorage.setItem('xpkitAccessToken', authResponse['access_token']);
+            return this.$router.push({ name: 'visitor-details' });
+        };
 
-                if (data['error']) {
-                    this.error = this.errors[data['error']];
-                }
-            });
+        if (authResponse['error']) {
+            this.error = this.errors[authResponse['error']];
         }
     }
 }

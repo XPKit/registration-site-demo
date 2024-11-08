@@ -1,5 +1,5 @@
 <script>
-import getPkce from 'oauth-pkce';
+import { generateLoginUrls } from 'xpkit-sdk';
 
 export default {
     name: 'RegisterView',
@@ -8,9 +8,7 @@ export default {
             showOptions: false,
             enableRegister: this.appSettings.xpkit.enable_xpkit_register,
             authProviders: this.appSettings.xpkit.auth_providers,
-            codeVerifier: null,
-            codeChallenge: null,
-            state: null
+            buttonLinks: []
         }
     },
     methods: {
@@ -18,31 +16,17 @@ export default {
             return this.authProviders.includes(name)
         },
 
-        getProviderLink(name) {
+        async generateButtonLinks() {
             const redirectUrl = `${this.appSettings.domain}${this.appSettings.xpkit.auth_callback}`;
-            return `https://auth.${this.appSettings.xpkit.region}/authorize/?response_type=code&provider=${name}&client_id=${this.appSettings.xpkit.auth_client_id}&state=${this.state}&code_challenge=${this.codeChallenge}&code_challenge_method=S256&redirect_uri=${redirectUrl}`;
-        },
-
-        generatePkceValues() {
-            const sessionStorage = window.sessionStorage;
-
-            getPkce(43, (error, { verifier, challenge }) => {
-                if (! error) {
-                    this.codeVerifier = verifier;
-                    this.codeChallenge = challenge;
-                    this.state = crypto.randomUUID();
-
-                    sessionStorage.setItem('codeVerifier', this.codeVerifier);
-                    sessionStorage.setItem('state', this.state);
-
-                    if (this.$route.query.xpkit_login) {
-                        window.location.href = this.getProviderLink('xpkit');
-                    } else {
-                        this.showOptions = true;
-                    }
-
-                }
-            });
+            const options = {
+                base_url: this.appSettings.xpkit.region,
+                auth: {
+                    client_id: this.appSettings.xpkit.auth_client_id,
+                    client_secret: ''
+                },
+                logging: false
+            };
+            this.buttonLinks = await generateLoginUrls(options, this.authProviders, redirectUrl);
         }
     },
     computed: {
@@ -51,8 +35,9 @@ export default {
             return `https://auth.${this.appSettings.xpkit.region}/registration/${this.appSettings.xpkit.account_id}/?redirect_uri=${redirectUrl}`;
         }
     },
-    mounted() {
-        this.generatePkceValues();
+    async mounted() {
+        await this.generateButtonLinks();
+        this.showOptions = true;
     }
 }
 </script>
@@ -69,14 +54,14 @@ export default {
         <div class="row main register-buttons" v-if="showOptions">
             <div class="col-lg-3"></div>
             <div class="col-mob-6 col-lg-3">
-                <a :href="getProviderLink('apple')" v-if="isProviderEnabled('apple')" title="Sign in with Apple"><img src="/images/button_apple.png" alt="Sign in with Apple"></a>
-                <a :href="getProviderLink('google')" v-if="isProviderEnabled('google')" title="Sign in with Google"><img src="/images/button_google.png" alt="Sign in with Google"></a>
-                <a :href="getProviderLink('microsoft')" v-if="isProviderEnabled('microsoft')" title="Sign in with Microsoft"><img src="/images/button_microsoft.png" alt="Sign in with Microsoft"></a>
+                <a :href="buttonLinks['apple']" v-if="isProviderEnabled('apple')" title="Sign in with Apple"><img src="/images/button_apple.png" alt="Sign in with Apple"></a>
+                <a :href="buttonLinks['google']" v-if="isProviderEnabled('google')" title="Sign in with Google"><img src="/images/button_google.png" alt="Sign in with Google"></a>
+                <a :href="buttonLinks['microsoft']" v-if="isProviderEnabled('microsoft')" title="Sign in with Microsoft"><img src="/images/button_microsoft.png" alt="Sign in with Microsoft"></a>
             </div>
             <div class="col-mob-6 col-lg-3">
-                <a :href="getProviderLink('facebook')" v-if="isProviderEnabled('facebook')" title="Sign in with Facebook"><img src="/images/button_facebook.png" alt="Sign in with Facebook"></a>
-                <a :href="getProviderLink('linkedin')" v-if="isProviderEnabled('linkedin')" title="Sign in with LinkedIn"><img src="/images/button_linkedin.png" alt="Sign in with LinkedIn"></a>
-                <a :href="getProviderLink('xpkit')" v-if="isProviderEnabled('xpkit')" title="Sign in with XPKit"><img src="/images/button_xpkit.png" alt="Sign in with XPKit"></a>
+                <a :href="buttonLinks['facebook']" v-if="isProviderEnabled('facebook')" title="Sign in with Facebook"><img src="/images/button_facebook.png" alt="Sign in with Facebook"></a>
+                <a :href="buttonLinks['linkedin']" v-if="isProviderEnabled('linkedin')" title="Sign in with LinkedIn"><img src="/images/button_linkedin.png" alt="Sign in with LinkedIn"></a>
+                <a :href="buttonLinks['xpkit']" v-if="isProviderEnabled('xpkit')" title="Sign in with XPKit"><img src="/images/button_xpkit.png" alt="Sign in with XPKit"></a>
             </div>
             <div class="col-lg-3"></div>
         </div>
