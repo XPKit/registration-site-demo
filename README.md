@@ -71,7 +71,6 @@ npm run build
 
 ## Support
 
-- [XPKit Community](https://community.xpkit.com): ask the development team a question
 - [XPKit Developer Docs](https://developer.xpkit.com)
 
 
